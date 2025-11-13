@@ -1,4 +1,3 @@
-@@ -0,0 +1,177 @@
 # SSM Server Connect
 
 AWS Systems Manager Session Manager를 통해 리눅스 서버에 쉽게 접속할 수 있는 CLI 도구입니다.
