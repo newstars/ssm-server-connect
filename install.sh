@@ -238,7 +238,7 @@ check_jq() {
 install_ssm_connect() {
     local install_dir="/usr/local/bin"
     local script_name="ssm-connect"
-    local script_url="https://raw.githubusercontent.com/[username]/ssm-server-connect/main/ssm-exec-fzf.sh"
+    local script_url="https://raw.githubusercontent.com/newstars/ssm-server-connect/main/ssm-exec-fzf.sh"
     
     log_info "SSM Server Connect 스크립트를 다운로드하는 중..."
     
