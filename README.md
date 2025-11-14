@@ -16,14 +16,14 @@ AWS Systems Manager Session Manager를 통해 리눅스 서버에 쉽게 접속�
 ### 빠른 설치 (권장)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/[username]/ssm-server-connect/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/newstars/ssm-server-connect/main/install.sh | bash
 ```
 
 ### 수동 설치
 
 1. 스크립트 다운로드:
 ```bash
-curl -O https://raw.githubusercontent.com/[username]/ssm-server-connect/main/ssm-exec-fzf.sh
+curl -O https://raw.githubusercontent.com/newstars/ssm-server-connect/main/ssm-exec-fzf.sh
 chmod +x ssm-exec-fzf.sh
 ```
 
