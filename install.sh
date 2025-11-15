@@ -2,18 +2,20 @@
 
 # SSM Server Connect 설치 스크립트
 #
-# 사용법:
+# 사용법 (설치):
 #   ./install.sh                         # 기본 설치 (/usr/local/bin/ssm-connect)
 #   ./install.sh --install-dir /경로     # 설치 경로 지정
-#   ./install.sh --uninstall             # 기본 경로에서 ssm-connect 제거
-#   ./install.sh --uninstall --install-dir /경로   # 지정 경로에서 제거
 #   ./install.sh -h | --help             # 도움말 출력
 #
 # 설치 후 사용법:
 #   ssm-connect                          # 기본 리전(ap-northeast-2) 사용
 #   ssm-connect <region>                 # 특정 리전 지정 (예: ssm-connect us-west-2)
 #
-# 이 스크립트는 SSM Server Connect 도구와 필요한 의존성을 자동으로 설치/삭제합니다.
+# curl 사용 예:
+#   curl -sSL https://raw.githubusercontent.com/newstars/ssm-server-connect/main/install.sh | bash
+#   curl -sSL https://raw.githubusercontent.com/newstars/ssm-server-connect/main/install.sh | bash -s -- --install-dir "$HOME/bin"
+#
+# 이 스크립트는 SSM Server Connect 도구와 필요한 의존성을 자동으로 설치합니다.
 
 set -euo pipefail
 
@@ -27,7 +29,6 @@ NC='\033[0m' # No Color
 # 기본 설치 경로
 INSTALL_DIR_DEFAULT="/usr/local/bin"
 INSTALL_DIR="$INSTALL_DIR_DEFAULT"
-ACTION="install"  # install 또는 uninstall
 
 # 로그 함수들
 log_info() {
@@ -49,13 +50,11 @@ log_error() {
 # 스크립트 사용법 출력
 print_usage() {
     cat <<EOF
-SSM Server Connect 설치/삭제 스크립트
+SSM Server Connect 설치 스크립트
 
 사용법:
   $(basename "$0")                         기본 설치 (${INSTALL_DIR_DEFAULT}/ssm-connect)
   $(basename "$0") --install-dir /경로     설치 경로 지정
-  $(basename "$0") --uninstall             ssm-connect 제거 (${INSTALL_DIR_DEFAULT} 기준)
-  $(basename "$0") --uninstall --install-dir /경로   지정 경로에서 ssm-connect 제거
   $(basename "$0") -h | --help             이 도움말 출력
 
 설치 후 사용법:
@@ -63,8 +62,11 @@ SSM Server Connect 설치/삭제 스크립트
   ssm-connect <region>                     특정 리전 지정 (예: ssm-connect us-west-2)
 
 옵션:
-  --install-dir DIR   ssm-connect 설치/삭제 경로 (기본: ${INSTALL_DIR_DEFAULT})
-  --uninstall         설치된 ssm-connect를 제거
+  --install-dir DIR   ssm-connect 설치 경로 (기본: ${INSTALL_DIR_DEFAULT})
+
+curl 사용 예:
+  curl -sSL https://raw.githubusercontent.com/newstars/ssm-server-connect/main/install.sh | bash
+  curl -sSL https://raw.githubusercontent.com/newstars/ssm-server-connect/main/install.sh | bash -s -- --install-dir "\$HOME/bin"
 
 EOF
 }
@@ -378,38 +380,6 @@ install_ssm_connect() {
     fi
 }
 
-# ssm-connect 삭제
-uninstall_ssm_connect() {
-    local script_name="ssm-connect"
-    local target_path="${INSTALL_DIR}/${script_name}"
-
-    log_info "삭제 대상 경로: ${target_path}"
-
-    if [[ ! -e "$target_path" ]]; then
-        log_warning "해당 경로에 ssm-connect가 존재하지 않습니다: ${target_path}"
-        log_info "다른 경로에 설치했을 수 있습니다. --install-dir 옵션을 사용해 다시 시도해보세요."
-        return 0
-    fi
-
-    if ! ask_yes_no "정말로 ${target_path} 를 삭제하시겠습니까?" "n"; then
-        log_info "삭제를 취소했습니다."
-        return 0
-    fi
-
-    if [[ -w "$INSTALL_DIR" ]]; then
-        rm -f "$target_path"
-    else
-        log_info "관리자 권한이 필요합니다. sudo로 삭제를 진행합니다..."
-        sudo rm -f "$target_path"
-    fi
-
-    log_success "ssm-connect가 삭제되었습니다: ${target_path}"
-    echo
-    echo "참고:"
-    echo "  - fzf, jq, AWS CLI, Session Manager Plugin 등 의존성은 그대로 남아있습니다."
-    echo "  - 원하면 패키지 매니저(brew, apt, yum 등)로 별도로 제거할 수 있습니다."
-}
-
 # 설치 완료 메시지
 show_completion_message() {
     echo
@@ -443,9 +413,6 @@ main() {
                 shift || true
                 INSTALL_DIR="${1:-$INSTALL_DIR_DEFAULT}"
                 ;;
-            --uninstall)
-                ACTION="uninstall"
-                ;;
             *)
                 log_warning "알 수 없는 인자: $1"
                 print_usage
@@ -455,21 +422,15 @@ main() {
         shift || true
     done
 
-    echo "SSM Server Connect 설치/삭제 스크립트"
-    echo "======================================"
+    echo "SSM Server Connect 설치 스크립트"
+    echo "================================="
     echo
 
     local os
     os=$(detect_os)
     log_info "운영체제: $os"
-    log_info "작업: ${ACTION}"
-    log_info "경로: ${INSTALL_DIR}"
+    log_info "설치 경로: ${INSTALL_DIR}"
     echo
-
-    if [[ "$ACTION" == "uninstall" ]]; then
-        uninstall_ssm_connect
-        exit 0
-    fi
 
     # 의존성 확인 및 설치
     log_info "의존성을 확인하는 중..."
