@@ -1,7 +1,7 @@
-# SSM Server Connect
+# ssm-server-connect
 
-AWS EC2 인스턴스에 **SSM Session Manager + FZF 인터페이스**로 빠르게 접속하기 위한 CLI 도구입니다.  
-AWS 프로파일, 리전, 인스턴스 목록을 자동으로 탐색하고, fzf UI에서 선택 → 바로 SSM 접속까지 한 번에 처리합니다.
+AWS SSM Session Manager + fzf 를 이용해서  
+EC2 인스턴스 목록을 고르고 바로 SSM 세션으로 접속하는 CLI 도구입니다.
 
 ---
 
